@@ -34,7 +34,7 @@ export default function PaymentsScreen() {
   const activeCycle = cycles.find(c => c.status === 'active');
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  const formatAmt = (n: number) => `GHS ${n.toLocaleString()}`;
+  const formatAmt = (n: number) => `SLE ${n.toLocaleString()}`;
   const methodLabel = (m: string) => m.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
 
   const methodIcon = (m: string): React.ComponentProps<typeof Ionicons>['name'] => {

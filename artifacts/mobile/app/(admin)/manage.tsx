@@ -169,7 +169,7 @@ export default function ManageScreen() {
                 <View style={s.cycleTop}>
                   <View style={{ flex: 1 }}>
                     <Text style={s.cycleName}>{c.groupName}</Text>
-                    <Text style={s.cycleMeta}>GHS {c.contributionAmount.toLocaleString()} · {c.frequency} · {c.numberOfMembers} members</Text>
+                    <Text style={s.cycleMeta}>SLE {c.contributionAmount.toLocaleString()} · {c.frequency} · {c.numberOfMembers} members</Text>
                   </View>
                   <View style={[s.statusBadge, { backgroundColor: sc.bg }]}>
                     <Text style={[s.statusTxt, { color: sc.color }]}>{c.status}</Text>
@@ -246,7 +246,7 @@ export default function ManageScreen() {
             { label: 'Group Name *', key: 'groupName', placeholder: 'e.g. Unity Group', caps: 'words' as const },
             { label: 'Start Date', key: 'startDate', placeholder: 'YYYY-MM-DD', caps: 'none' as const },
             { label: 'End Date', key: 'endDate', placeholder: 'YYYY-MM-DD', caps: 'none' as const },
-            { label: 'Contribution Amount (GHS) *', key: 'contributionAmount', placeholder: 'e.g. 500', caps: 'none' as const },
+            { label: 'Contribution Amount (SLE) *', key: 'contributionAmount', placeholder: 'e.g. 500', caps: 'none' as const },
             { label: 'Number of Members', key: 'numberOfMembers', placeholder: 'e.g. 10', caps: 'none' as const },
           ].map(({ label, key, placeholder, caps }) => (
             <View key={key} style={s.mField}>

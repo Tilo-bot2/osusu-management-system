@@ -45,7 +45,7 @@ export default function OsusuInfoScreen() {
   const bottomPad = Platform.OS === 'web' ? insets.bottom + 34 + 84 : insets.bottom + 64;
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-  const formatAmt = (n: number) => `GHS ${n.toLocaleString()}`;
+  const formatAmt = (n: number) => `SLE ${n.toLocaleString()}`;
 
   const totalCollected = contributions.reduce((s, c) => s + c.amount, 0);
   const activeMembers = members.filter(m => m.status === 'active').length;

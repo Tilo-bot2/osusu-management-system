@@ -68,7 +68,7 @@ export default function ReportsScreen() {
     })
     .sort((a, b) => b.paid - a.paid);
 
-  const formatAmt = (n: number) => `GHS ${n.toLocaleString()}`;
+  const formatAmt = (n: number) => `SLE ${n.toLocaleString()}`;
 
   const handleShare = async () => {
     const reportTitle = `${reportType.charAt(0).toUpperCase() + reportType.slice(1)} Report — ${new Date().toLocaleDateString('en-GB')}`;

@@ -29,7 +29,7 @@ export default function AdminDashboard() {
   const recentPayments = [...contributions].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
   const recentLogs = auditLogs.slice(0, 5);
 
-  const formatAmt = (n: number) => `GHS ${n.toLocaleString()}`;
+  const formatAmt = (n: number) => `SLE ${n.toLocaleString()}`;
   const formatDate = (d: string) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 
   const s = styles(colors);

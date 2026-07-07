@@ -37,7 +37,7 @@ const SEED: AppData = {
     { id: 'con7', memberId: 'OSU001', memberName: 'Kwame Asante', amount: 500, date: threeAgo, paymentMethod: 'mobile_money', remarks: '' },
   ],
   announcements: [
-    { id: 'ann1', title: 'Payment Deadline Reminder', message: 'All members are reminded to make their daily contributions by 5:00 PM. Late payments will attract a GHS 50 penalty.', type: 'payment_deadline', date: todayStr },
+    { id: 'ann1', title: 'Payment Deadline Reminder', message: 'All members are reminded to make their daily contributions by 5:00 PM. Late payments will attract a SLE 50 penalty.', type: 'payment_deadline', date: todayStr },
     { id: 'ann2', title: 'Monthly General Meeting', message: 'There will be a general meeting this Saturday at 10:00 AM at the community center. All members must attend.', type: 'general', date: yday },
   ],
   cycles: [

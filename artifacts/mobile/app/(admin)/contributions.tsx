@@ -71,18 +71,18 @@ export default function ContributionsScreen() {
     const data = { memberId: form.memberId, memberName: form.memberName, amount: amt, date: form.date, paymentMethod: form.paymentMethod, remarks: form.remarks };
     if (editId) {
       updateContribution(editId, data);
-      addAuditLog('Payment Updated', `Updated GHS ${amt} from ${form.memberName}`);
+      addAuditLog('Payment Updated', `Updated SLE ${amt} from ${form.memberName}`);
     } else {
       addContribution(data);
-      addAuditLog('Payment Recorded', `Recorded GHS ${amt} from ${form.memberName} (${form.memberId})`);
+      addAuditLog('Payment Recorded', `Recorded SLE ${amt} from ${form.memberName} (${form.memberId})`);
     }
     setShowModal(false);
   };
 
   const handleDelete = (c: Contribution) => {
-    Alert.alert('Delete Payment', `Remove GHS ${c.amount} payment from ${c.memberName}?`, [
+    Alert.alert('Delete Payment', `Remove SLE ${c.amount} payment from ${c.memberName}?`, [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => { deleteContribution(c.id); addAuditLog('Payment Deleted', `Deleted GHS ${c.amount} from ${c.memberName}`); } },
+      { text: 'Delete', style: 'destructive', onPress: () => { deleteContribution(c.id); addAuditLog('Payment Deleted', `Deleted SLE ${c.amount} from ${c.memberName}`); } },
     ]);
   };
 
@@ -108,7 +108,7 @@ export default function ContributionsScreen() {
         {c.remarks ? <Text style={s.rowRemarks}>{c.remarks}</Text> : null}
       </View>
       <View style={{ alignItems: 'flex-end', gap: 6 }}>
-        <Text style={s.rowAmt}>GHS {c.amount.toLocaleString()}</Text>
+        <Text style={s.rowAmt}>SLE {c.amount.toLocaleString()}</Text>
         <View style={s.rowActions}>
           <TouchableOpacity style={[s.iconBtn, { backgroundColor: '#1E3A5F' }]} onPress={() => openEdit(c)}>
             <Ionicons name="pencil-outline" size={14} color="#60A5FA" />
@@ -135,11 +135,11 @@ export default function ContributionsScreen() {
         <View style={s.summaryRow}>
           <View style={s.summCard}>
             <Text style={s.summLabel}>Today</Text>
-            <Text style={s.summVal}>GHS {todayTotal.toLocaleString()}</Text>
+            <Text style={s.summVal}>SLE {todayTotal.toLocaleString()}</Text>
           </View>
           <View style={s.summCard}>
             <Text style={s.summLabel}>Filtered Total</Text>
-            <Text style={s.summVal}>GHS {totalFiltered.toLocaleString()}</Text>
+            <Text style={s.summVal}>SLE {totalFiltered.toLocaleString()}</Text>
           </View>
         </View>
 
@@ -206,7 +206,7 @@ export default function ContributionsScreen() {
             />
           </View>
           <View style={s.mField}>
-            <Text style={s.mLabel}>Amount (GHS) *</Text>
+            <Text style={s.mLabel}>Amount (SLE) *</Text>
             <TextInput
               style={s.mInput}
               placeholder="e.g. 500"

@@ -35,7 +35,7 @@ export default function MemberDashboard() {
   const paidToday = myContributions.filter(c => c.date === today).length > 0;
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  const formatAmt = (n: number) => `GHS ${n.toLocaleString()}`;
+  const formatAmt = (n: number) => `SLE ${n.toLocaleString()}`;
 
   const s = styles(colors);
   const topPad = Platform.OS === 'web' ? insets.top + 67 : insets.top;
