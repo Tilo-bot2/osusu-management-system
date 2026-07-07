@@ -1,5 +1,6 @@
 import React from 'react';
 import { Platform, StyleSheet, useColorScheme, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -8,9 +9,11 @@ import { Tabs } from 'expo-router';
 export default function MemberTabLayout() {
   const colors = useColors();
   const colorScheme = useColorScheme();
+  const insets = useSafeAreaInsets();
   const isDark = colorScheme === 'dark';
   const isIOS = Platform.OS === 'ios';
   const isWeb = Platform.OS === 'web';
+  const tabBarHeight = isWeb ? 84 : 72 + insets.bottom;
 
   return (
     <Tabs
@@ -24,11 +27,17 @@ export default function MemberTabLayout() {
           borderTopWidth: 1,
           borderTopColor: colors.border,
           elevation: 0,
-          height: isWeb ? 84 : 64,
+          height: tabBarHeight,
+          paddingBottom: isWeb ? 8 : insets.bottom + 6,
+          paddingTop: 8,
         },
         tabBarLabelStyle: {
           fontFamily: 'Inter_500Medium',
-          fontSize: 11,
+          fontSize: 12,
+          marginTop: 2,
+        },
+        tabBarIconStyle: {
+          marginTop: 4,
         },
         tabBarBackground: () =>
           isIOS ? (
@@ -42,35 +51,35 @@ export default function MemberTabLayout() {
         name="dashboard"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={26} color={color} />,
         }}
       />
       <Tabs.Screen
         name="payments"
         options={{
           title: 'Payments',
-          tabBarIcon: ({ color, size }) => <Ionicons name="cash-outline" size={size} color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="cash-outline" size={26} color={color} />,
         }}
       />
       <Tabs.Screen
         name="announcements"
         options={{
           title: 'Notices',
-          tabBarIcon: ({ color, size }) => <Ionicons name="notifications-outline" size={size} color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="notifications-outline" size={26} color={color} />,
         }}
       />
       <Tabs.Screen
         name="osusu"
         options={{
           title: 'My Osusu',
-          tabBarIcon: ({ color, size }) => <Ionicons name="people-outline" size={size} color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="people-outline" size={26} color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color, size }) => <Ionicons name="person-circle-outline" size={size} color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="person-circle-outline" size={26} color={color} />,
         }}
       />
     </Tabs>
