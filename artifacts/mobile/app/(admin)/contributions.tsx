@@ -24,7 +24,10 @@ export default function ContributionsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { isLoggedIn, isAdmin } = useAuth();
-  const { contributions, members, addContribution, updateContribution, deleteContribution, addAuditLog } = useData();
+  const { contributions, members, cycles, addContribution, updateContribution, deleteContribution, addAuditLog } = useData();
+
+  const activeCycle = cycles.find(c => c.status === 'active');
+  const defaultAmount = activeCycle ? activeCycle.contributionAmount.toString() : '';
 
   useEffect(() => {
     if (!isLoggedIn || !isAdmin) router.replace('/');
@@ -51,7 +54,7 @@ export default function ContributionsScreen() {
   const totalFiltered = filtered.reduce((s, c) => s + c.amount, 0);
   const todayTotal = contributions.filter(c => c.date === today).reduce((s, c) => s + c.amount, 0);
 
-  const openAdd = () => { setForm({ ...EMPTY_FORM }); setEditId(null); setShowModal(true); };
+  const openAdd = () => { setForm({ ...EMPTY_FORM, amount: defaultAmount }); setEditId(null); setShowModal(true); };
   const openEdit = (c: Contribution) => {
     setForm({ memberId: c.memberId, memberName: c.memberName, amount: c.amount.toString(), date: c.date, paymentMethod: c.paymentMethod, remarks: c.remarks });
     setEditId(c.id); setShowModal(true);
@@ -209,12 +212,17 @@ export default function ContributionsScreen() {
             <Text style={s.mLabel}>Amount (SLE) *</Text>
             <TextInput
               style={s.mInput}
-              placeholder="e.g. 500"
+              placeholder={activeCycle ? `Default: ${activeCycle.contributionAmount.toLocaleString()}` : 'Enter amount'}
               placeholderTextColor="#6B7280"
               value={form.amount}
               onChangeText={v => setForm(f => ({ ...f, amount: v }))}
               keyboardType="numeric"
             />
+            {activeCycle && (
+              <Text style={{ fontSize: 11, color: '#9CA3AF', marginTop: 4 }}>
+                Active cycle rate: SLE {activeCycle.contributionAmount.toLocaleString()} / {activeCycle.frequency}
+              </Text>
+            )}
           </View>
           <View style={s.mField}>
             <Text style={s.mLabel}>Date</Text>
