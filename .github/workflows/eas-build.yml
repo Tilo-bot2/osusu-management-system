@@ -25,7 +25,7 @@ jobs:
           version: 9
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       - name: Build Android APK (preview)
         uses: expo/expo-github-action@v8
