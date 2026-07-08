@@ -14,7 +14,8 @@
       "backgroundColor": "#0F5132"
     },
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "bundleIdentifier": "com.osusu.managementsystem"
     },
     "android": {},
     "web": {
