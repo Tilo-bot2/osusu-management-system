@@ -43,18 +43,47 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build mobile app
+      - name: Decode keystore
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/'))
+        run: |
+          echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > artifacts/mobile/android/app/release.keystore
+        env:
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+
+      - name: Build debug APK
+        if: github.event_name == 'pull_request'
+        working-directory: artifacts/mobile
+        run: |
+          cd android
+          ./gradlew assembleDebug
+        env:
+          ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+
+      - name: Build release APK
+        if: github.event_name != 'pull_request'
         working-directory: artifacts/mobile
         run: |
           cd android
           ./gradlew assembleRelease
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+          KEYSTORE_PATH: ${{ github.workspace }}/artifacts/mobile/android/app/release.keystore
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-      - name: Upload APK to artifacts
+      - name: Upload debug APK to artifacts
+        if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
-          name: android-apk
+          name: android-debug-apk
+          path: artifacts/mobile/android/app/build/outputs/apk/debug/
+
+      - name: Upload release APK to artifacts
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release-apk
           path: artifacts/mobile/android/app/build/outputs/apk/release/
 
       - name: Create Release (on tag)
@@ -62,5 +91,25 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: artifacts/mobile/android/app/build/outputs/apk/release/*.apk
+          body: |
+            ## Release APK
+            
+            Download the Android APK from the assets below.
+            
+            **Version:** ${{ github.ref_name }}
+            **Build Date:** ${{ github.event.head_commit.timestamp }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean up keystore
+        if: always()
+        run: rm -f artifacts/mobile/android/app/release.keystore
+
+      - name: Notify Build Status
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: 'APK Build ${{ job.status }}: ${{ github.repository }} - ${{ github.ref_name }}'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        continue-on-error: true
