@@ -1,3 +1,10 @@
-const { getDefaultConfig } = require('expo/metro-config');
+const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 
-module.exports = getDefaultConfig(__dirname);
+const config = {
+  projectRoot: __dirname,
+  watchFolders: [
+    __dirname,
+  ],
+};
+
+module.exports = mergeConfig(getDefaultConfig(__dirname), config);

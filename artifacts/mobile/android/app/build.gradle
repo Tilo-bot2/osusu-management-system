@@ -1,0 +1,72 @@
+apply plugin: "com.android.application"
+apply plugin: "com.facebook.react"
+
+import com.android.build.OutputFile
+import org.apache.tools.ant.taskdefs.condition.Os
+
+react {
+    entryFile = file(["node_modules/react-native/scripts/findNodeModules.js"].execute().text.trim() + "/react-native/cli.js")
+    reactNativeDir = null
+}
+
+android {
+    ndkVersion = "25.1.8937393"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    namespace = "com.osusuapp"
+    defaultConfig {
+        applicationId "com.osusuapp"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "0.0.1"
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
+        release {
+            storeFile file(System.getenv('KEYSTORE_PATH') ?: 'release.keystore')
+            storePassword System.getenv('KEYSTORE_PASSWORD')
+            keyAlias System.getenv('KEY_ALIAS')
+            keyPassword System.getenv('KEY_PASSWORD')
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+    }
+
+    flavorDimensions "store"
+    productFlavors {
+        play {
+            dimension "store"
+        }
+    }
+
+    packagingOptions {
+        pickFirst '**/armeabi-v7a/libreactnativejni.so'
+        pickFirst '**/x86/libreactnativejni.so'
+        pickFirst '**/x86_64/libreactnativejni.so'
+        pickFirst '**/arm64-v8a/libreactnativejni.so'
+    }
+}
+
+dependencies {
+    implementation 'com.facebook.react:react-android'
+    implementation "androidx.appcompat:appcompat:1.5.1"
+    implementation "androidx.core:core-compat:1.9.0"
+    implementation "androidx.core:core:1.9.0"
+    implementation "com.google.android.material:material:1.9.0"
+}

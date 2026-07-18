@@ -1,0 +1,5 @@
+include ':app'
+project(':app').projectDir = new File(rootDir, 'app')
+
+includeBuild('../../../node_modules/react-native-gradle-plugin')
+includeBuild('../../../node_modules/@react-native-community/cli-platform-android')
