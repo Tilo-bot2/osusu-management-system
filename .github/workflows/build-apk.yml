@@ -20,16 +20,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js with pnpm
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'pnpm'
+          package-manager: 'pnpm'
+          package-manager-version: 'latest'
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+      - name: Install dependencies (root)
+        run: pnpm install --no-frozen-lockfile
 
       - name: Setup Java JDK
         uses: actions/setup-java@v4
@@ -40,31 +39,29 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install dependencies
-        run: pnpm install
+      - name: Install mobile dependencies
+        working-directory: artifacts/mobile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Decode keystore
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/'))
         run: |
+          mkdir -p artifacts/mobile/android/app
           echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > artifacts/mobile/android/app/release.keystore
         env:
           KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
 
       - name: Build debug APK
         if: github.event_name == 'pull_request'
-        working-directory: artifacts/mobile
-        run: |
-          cd android
-          ./gradlew assembleDebug
+        working-directory: artifacts/mobile/android
+        run: ./gradlew assembleDebug
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
       - name: Build release APK
         if: github.event_name != 'pull_request'
-        working-directory: artifacts/mobile
-        run: |
-          cd android
-          ./gradlew assembleRelease
+        working-directory: artifacts/mobile/android
+        run: ./gradlew assembleRelease
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
           KEYSTORE_PATH: ${{ github.workspace }}/artifacts/mobile/android/app/release.keystore
@@ -78,6 +75,7 @@ jobs:
         with:
           name: android-debug-apk
           path: artifacts/mobile/android/app/build/outputs/apk/debug/
+          if-no-files-found: ignore
 
       - name: Upload release APK to artifacts
         if: github.event_name != 'pull_request'
@@ -85,6 +83,7 @@ jobs:
         with:
           name: android-release-apk
           path: artifacts/mobile/android/app/build/outputs/apk/release/
+          if-no-files-found: ignore
 
       - name: Create Release (on tag)
         if: startsWith(github.ref, 'refs/tags/')
@@ -105,8 +104,8 @@ jobs:
         if: always()
         run: rm -f artifacts/mobile/android/app/release.keystore
 
-      - name: Notify Build Status
-        if: always()
+      - name: Notify Build Status (Slack)
+        if: always() && secrets.SLACK_WEBHOOK != ''
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
