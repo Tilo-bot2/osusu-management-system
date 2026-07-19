@@ -58,6 +58,12 @@ jobs:
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
+      - name: Check Android folder
+        working-directory: artifacts/mobile/android
+        run: |
+          pwd
+          ls -la
+
       - name: Build release APK (for main/develop/tags)
         if: github.event_name != 'pull_request'
         working-directory: artifacts/mobile/android
