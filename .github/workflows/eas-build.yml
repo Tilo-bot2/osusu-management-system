@@ -10,6 +10,11 @@ jobs:
   build:
     name: Build Android APK
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: artifacts/mobile
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -25,7 +30,6 @@ jobs:
           version: 9
 
       - name: Install dependencies
-        working-directory: artifacts/mobile
         run: pnpm install --no-frozen-lockfile
 
       - name: Setup EAS
@@ -35,7 +39,6 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Run EAS Build
-        working-directory: artifacts/mobile
         run: eas build --platform android --profile preview --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
