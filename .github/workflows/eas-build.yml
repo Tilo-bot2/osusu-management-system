@@ -25,9 +25,10 @@ jobs:
           version: 9
 
       - name: Install dependencies
+        working-directory: artifacts/mobile
         run: pnpm install --no-frozen-lockfile
 
-      - name: Build Android APK (preview)
+      - name: Setup EAS
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
