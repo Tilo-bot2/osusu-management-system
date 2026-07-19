@@ -20,7 +20,9 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.osusu.managementsystem"
     },
-    "android": {},
+    "android": {
+      "package": "com.osusu.managementsystem"
+    },
     "web": {
       "favicon": "./assets/images/icon.png"
     },
