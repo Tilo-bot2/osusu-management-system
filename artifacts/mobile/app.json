@@ -3,11 +3,9 @@
     "name": "Osusu Management System",
     "slug": "mobile",
     "version": "1.0.0",
-
     "cli": {
       "appVersionSource": "remote"
     },
-
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "mobile",
@@ -17,6 +15,27 @@
       "image": "./assets/images/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#0F5132"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.osusu.managementsystem"
+    },
+    "android": {},
+    "web": {
+      "favicon": "./assets/images/icon.png"
+    },
+    "plugins": [
+      "expo-font",
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7002ff8d-ef4b-4246-9672-5bdd9a5b7b89"
+      }
     }
   }
 }
