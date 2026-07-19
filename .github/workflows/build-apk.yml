@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK (Gradle)
 
 on:
   push:
@@ -20,21 +20,39 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js with pnpm
+      - name: Setup Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          package-manager: 'pnpm'
-          package-manager-version: 'latest'
 
-      - name: Install dependencies (root)
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install root dependencies
         run: pnpm install --no-frozen-lockfile
 
-      - name: Setup Java JDK
+      - name: Setup Java JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: gradle
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -43,25 +61,23 @@ jobs:
         working-directory: artifacts/mobile
         run: pnpm install --no-frozen-lockfile
 
-      - name: Decode keystore
+      - name: Decode keystore (Release builds only)
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/tags/'))
         run: |
           mkdir -p artifacts/mobile/android/app
           echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > artifacts/mobile/android/app/release.keystore
-        env:
-          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
 
-      - name: Build debug APK
+      - name: Build debug APK (for PRs)
         if: github.event_name == 'pull_request'
         working-directory: artifacts/mobile/android
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug --stacktrace
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
 
-      - name: Build release APK
+      - name: Build release APK (for main/develop/tags)
         if: github.event_name != 'pull_request'
         working-directory: artifacts/mobile/android
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease --stacktrace
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
           KEYSTORE_PATH: ${{ github.workspace }}/artifacts/mobile/android/app/release.keystore
@@ -69,46 +85,30 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-      - name: Upload debug APK to artifacts
-        if: github.event_name == 'pull_request'
+      - name: Upload debug APK
+        if: github.event_name == 'pull_request' && always()
         uses: actions/upload-artifact@v4
         with:
-          name: android-debug-apk
-          path: artifacts/mobile/android/app/build/outputs/apk/debug/
+          name: debug-apk
+          path: artifacts/mobile/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: ignore
 
-      - name: Upload release APK to artifacts
-        if: github.event_name != 'pull_request'
+      - name: Upload release APK
+        if: github.event_name != 'pull_request' && always()
         uses: actions/upload-artifact@v4
         with:
-          name: android-release-apk
-          path: artifacts/mobile/android/app/build/outputs/apk/release/
+          name: release-apk
+          path: artifacts/mobile/android/app/build/outputs/apk/release/app-release.apk
           if-no-files-found: ignore
 
-      - name: Create Release (on tag)
+      - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
-          files: artifacts/mobile/android/app/build/outputs/apk/release/*.apk
-          body: |
-            ## Release APK
-            
-            Download the Android APK from the assets below.
-            
-            **Version:** ${{ github.ref_name }}
-            **Build Date:** ${{ github.event.head_commit.timestamp }}
+          files: artifacts/mobile/android/app/build/outputs/apk/release/app-release.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Clean up keystore
+      - name: Cleanup keystore
         if: always()
         run: rm -f artifacts/mobile/android/app/release.keystore
-
-      - name: Notify Build Status (Slack)
-        if: always() && secrets.SLACK_WEBHOOK != ''
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          text: 'APK Build ${{ job.status }}: ${{ github.repository }} - ${{ github.ref_name }}'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
-        continue-on-error: true
